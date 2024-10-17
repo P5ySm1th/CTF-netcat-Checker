@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
 
 from flag import FLAG
-import time
 import sys
-
+import verify
 
 GREEN = '\033[92m'
 RED = '\033[91m'
 YELLOW = '\033[33m'
 NORM = '\033[0m'
 
-BANNER = \
-    f"""
-    {YELLOW} 
+BANNER = f"""
+{YELLOW} 
 
-    INSERT YOUR ASCII ART HERE
+INSERT YOUR ASCII ART HERE
 
-    {NORM}
+{NORM}
 
-    Welcome to XXXX Challenge!
-
-    """
+Welcome to XXXX Challenge!
+"""
 
 QUESTIONS = [
     "[1]. Your question here!",
@@ -36,16 +33,16 @@ QUESTIONS = [
 ]
 
 ANSWERS = [
-    "",
-    "",
-    "",
-    ["67C2B2E99EE18A4BFC42EFA407182207", "67C2B2E99EE18A4BFC42EFA407182207".lower()], # handle incasensitive answers or multiple answers
+    "1",
+    "2",
+    "3",
+    ["67C2B2E99EE18A4BFC42EFA407182207", "67C2B2E99EE18A4BFC42EFA407182207".lower()],
     ["ADS", "Alternate Data Streams", "Alternate Data Stream"],
-    ""
-    "",
-    "",
-    "",
-    ""
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
 ]
 
 assert len(QUESTIONS) == len(ANSWERS), "Questions and Answers length mismatch!"
@@ -53,37 +50,41 @@ assert len(QUESTIONS) == len(ANSWERS), "Questions and Answers length mismatch!"
 QnA = dict(zip(QUESTIONS, ANSWERS))
 
 def getInputnValidate():
-    wrong_counter = 0
-    for question in QnA.keys():
+    for question, answers in QnA.items():
         print(f"{YELLOW}{question}{NORM}")
-        user_input = ""
-        while user_input != QnA[question]:
-            # Timeout user after 5 wrong submissions
-            if (wrong_counter % 5 == 0) and (wrong_counter != 0):
-                time_out = 60 * (wrong_counter // 5)
-                print(f"{RED}TOO MUCH WRONG SUBMISSIONS. YOU WILL BE TIMEOUT FOR {time_out}s {NORM}")
-                sys.stdout.flush()
-                time.sleep(time_out)
-            user_input = input("==> ")
-            # Handle multiple answers
-            if any(ans == user_input for ans in QnA[question]) and (type(QnA[question]) == list):
-                wrong_counter = 0
-                print(f"{GREEN}CORRECT!{NORM}")
+        while True:
+            user_input = input("Answer: ")
+            if user_input in answers:
+                print(f"{GREEN}[+] Correct! {NORM}")
                 break
-            elif user_input != QnA[question]:
-                wrong_counter += 1
-                print(f"{RED}WRONG ANSWER!{NORM}")
             else:
-                wrong_counter = 0
-                print(f"{GREEN}CORRECT!{NORM}") 
-                
-    return True
-    
+                print(f"{RED}[-] Wrong answer! {NORM}")
+                sys.exit(0)
+
 def getFlag():
-    print(f"{GREEN}Congrats! Here is your flag: {FLAG}{NORM}")
+    print(f"{GREEN}[+] Congrats! Here is your flag: {FLAG}{NORM}")
     sys.exit(0)
+
+def ver1fy():
+    challenge = verify.get_challenge(31337)
+    print("== proof-of-work: enabled ==")
+    print("please solve a pow first")
+    print(f"You can run the solver with:")
+    print(f"    python3 <(curl -sSL {verify.SOLVER_URL}) solve {challenge}")
+    print("===================")
+    solution = input("Solution? ").strip()
     
-if __name__=="__main__":
+    if verify.verify_challenge(challenge, solution):
+        print(f"{GREEN}[+] Correct{NORM}")
+    else:
+        print(f"{RED}[-] Proof-of-work fail{NORM}")
+        sys.exit(1)
+
+def main():
+    ver1fy()
     print(BANNER)
-    if getInputnValidate():
-        getFlag()
+    getInputnValidate()
+    getFlag()
+
+if __name__ == "__main__":
+    main()

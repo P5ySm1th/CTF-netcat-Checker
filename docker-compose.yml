@@ -1,5 +1,0 @@
-services:
-  forensics_challenge:
-    build: .
-    ports:
-      - "1259:1259"
